@@ -41,16 +41,16 @@ func Concurrently(sourceFile, outputFile string, workers int) {
 	dumpToFile(combined, outputFile)
 }
 
-// DedupeConcurrently divides sourceFile into numGoroutines portions and dedupes that portion in a Goroutine.
-// The resulting Set is sent into setChan for processing.
-func dedupeConcurrently(sourceFile string, numGoroutines int, setChan chan *set.Set) {
-	offsets := divideFile(sourceFile, numGoroutines)
+// Starts workers to build deduplicated sets concurrently.
+// When finished, the set is sent to setChan.
+func dedupeConcurrently(sourceFile string, workers int, setChan chan *set.Set) {
+	offsets := divideFile(sourceFile, workers)
 	log.Println("Divided file for processing:", offsets)
 
-	for i := 0; i < numGoroutines; i++ {
+	for i := 0; i < workers; i++ {
 		go func(i int) {
 			d := newDeduper(sourceFile)
-			if i == numGoroutines-1 {
+			if i == workers-1 {
 				d.buildDedupedSet(offsets[i], -1)
 			} else {
 				d.buildDedupedSet(offsets[i], offsets[1])
