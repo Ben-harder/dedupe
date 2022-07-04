@@ -27,7 +27,11 @@ func New(path string, offset int64, stop int64) *reader {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Initalizing reader to read %v bytes from offset %v\n", stop, offset)
+	if stop == -1 {
+		log.Printf("Initalizing reader to read from offset %v\n", offset)
+	} else {
+		log.Printf("Initalizing reader to read %v bytes from offset %v\n", stop, offset)
+	}
 	return &reader{
 		s:      bufio.NewScanner(file),
 		f:      file,
